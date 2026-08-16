@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#121213">
+    <meta name="description" content="Fivefold, a free daily five-letter word puzzle.">
+    <title>Fivefold</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Fivefold</h1>
+    </header>
+
+    <main class="game" aria-labelledby="game-heading">
+      <h2 id="game-heading" class="visually-hidden">Daily five-letter puzzle</h2>
+      <p id="message" class="message" role="status" aria-live="polite"></p>
+      <section id="board" class="board" aria-label="Guess board"></section>
+      <section id="keyboard" class="keyboard" aria-label="On-screen keyboard"></section>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>
