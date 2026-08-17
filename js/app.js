@@ -11,6 +11,7 @@ import { answerForDate } from "./answer-schedule.js";
 import { localDateKey } from "./words.js";
 import { generateShareText } from "./share.js";
 import { copyText } from "./clipboard.js";
+import { createCompanionInterface } from "./companion-interface.js";
 import {
   STATS_STORAGE_KEY,
   createStats,
@@ -106,6 +107,21 @@ function recordCompletion() {
     // The game remains playable if storage is unavailable or full.
   }
 }
+
+function commitGuess(word) {
+  game = submitGuess(game, word);
+  currentInput = "";
+  if (game.status !== "playing") recordCompletion();
+  saveStoredData();
+  render();
+}
+
+const companion = createCompanionInterface({
+  getGame: () => game,
+  commitGuess,
+  metadataForAnswer
+});
+window.FivefoldCompanion = companion.api;
 
 function renderStats() {
   const summary = summarizeStats(stats);
@@ -238,7 +254,7 @@ function handleKey(key) {
       return;
     }
     try {
-      game = submitGuess(game, currentInput);
+      commitGuess(currentInput);
     } catch (error) {
       if (error instanceof InvalidGuessError) {
         message.textContent = error.message;
@@ -246,9 +262,8 @@ function handleKey(key) {
       }
       throw error;
     }
-    currentInput = "";
-    if (game.status !== "playing") recordCompletion();
-    saveStoredData();
+    companion.notify();
+    return;
   } else if (/^[a-z]$/i.test(key) && currentInput.length < WORD_LENGTH) {
     currentInput += key.toLowerCase();
     message.textContent = "";
