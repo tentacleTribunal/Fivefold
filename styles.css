@@ -29,7 +29,7 @@
   --filled-border: var(--color-border-strong);
   --key: #626a6b;
   --correct: var(--color-botanical);
-  --present: #9b762f;
+  --present: #76571f;
   --absent: #343a3c;
   --tile-empty: #171b1c;
   --tile-filled: #202526;
@@ -89,7 +89,7 @@ body {
   position: absolute;
   top: 50%;
   right: max(0.75rem, calc((100% - 500px) / 2));
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0.42rem 0.72rem;
   transform: translateY(-50%);
   border: 1px solid var(--filled-border);
@@ -232,7 +232,7 @@ button,
 
 .tile.correct,
 .key.correct {
-  border-color: var(--color-botanical-bright);
+  border: 3px double #9bc0aa;
   background: var(--correct);
   box-shadow:
     inset 0 0 0 1px rgb(238 230 213 / 14%),
@@ -241,7 +241,7 @@ button,
 
 .tile.present,
 .key.present {
-  border-color: #d0a65a;
+  border: 2px dashed #e0bc76;
   background: var(--present);
   box-shadow:
     inset 0 0 0 1px rgb(255 244 217 / 13%),
@@ -250,7 +250,7 @@ button,
 
 .tile.absent,
 .key.absent {
-  border-color: #586062;
+  border: 2px dotted #929b9c;
   background: var(--absent);
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 5%),
@@ -417,6 +417,8 @@ button,
 
 .stats-dialog {
   width: min(420px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
   padding: 1.4rem clamp(1rem, 5vw, 1.65rem) 1.6rem;
   border: 1px solid #c8bca4;
   border-radius: 2px;
@@ -460,6 +462,8 @@ button,
 }
 
 .stats-close {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   border: 0;
   background: transparent;
   color: var(--color-ink);
@@ -627,5 +631,63 @@ button,
 
   .board {
     width: min(300px, 72vh);
+  }
+}
+
+@media (max-width: 30rem) {
+  .site-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding-inline: 0.5rem;
+    text-align: left;
+  }
+
+  .site-header h1 {
+    min-width: 0;
+    padding-inline: 0.25rem;
+    font-size: clamp(1.6rem, 9vw, 2rem);
+  }
+
+  .stats-button {
+    position: static;
+    min-height: 2.75rem;
+    transform: none;
+  }
+
+  .answer-card {
+    width: 100%;
+    transform: none;
+  }
+
+  .keyboard-row {
+    gap: 0.2rem;
+  }
+
+  .key {
+    height: 3.25rem;
+    padding-inline: 0.1rem;
+  }
+}
+
+@media (max-width: 22rem) {
+  .board {
+    width: 100%;
+    padding: 0.35rem;
+  }
+
+  .stats-summary {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 1rem;
+  }
+
+  .stat-item:nth-child(3) {
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .answer-card {
+    transform: none;
   }
 }

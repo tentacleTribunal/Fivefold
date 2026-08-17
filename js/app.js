@@ -25,6 +25,11 @@ const KEY_ROWS = [
   ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
   ["Enter", "z", "x", "c", "v", "b", "n", "m", "Backspace"]
 ];
+const FEEDBACK_LABELS = {
+  correct: "correct",
+  present: "present elsewhere",
+  absent: "not in the word"
+};
 
 const board = document.querySelector("#board");
 const keyboard = document.querySelector("#keyboard");
@@ -132,12 +137,13 @@ function createBoard() {
   for (let row = 0; row < MAX_GUESSES; row += 1) {
     const rowElement = document.createElement("div");
     rowElement.className = "board-row";
-    rowElement.setAttribute("role", "group");
+    rowElement.setAttribute("role", "row");
     rowElement.setAttribute("aria-label", `Guess ${row + 1}`);
     for (let column = 0; column < WORD_LENGTH; column += 1) {
       const tile = document.createElement("div");
       tile.className = "tile";
-      tile.setAttribute("aria-label", "empty");
+      tile.setAttribute("role", "gridcell");
+      tile.setAttribute("aria-label", "Blank");
       rowElement.append(tile);
     }
     board.append(rowElement);
@@ -154,7 +160,7 @@ function createKeyboard() {
       button.className = `key${key.length > 1 ? " wide" : ""}`;
       button.dataset.key = key;
       button.textContent = key === "Backspace" ? "Delete" : key;
-      button.setAttribute("aria-label", key);
+      button.setAttribute("aria-label", key === "Backspace" ? "Delete letter" : key);
       rowElement.append(button);
     }
     keyboard.append(rowElement);
@@ -171,7 +177,10 @@ function render() {
       const feedback = completed?.feedback[columnIndex];
       tile.textContent = letter;
       tile.className = `tile${letter ? " filled" : ""}${feedback ? ` ${feedback}` : ""}`;
-      tile.setAttribute("aria-label", letter ? `${letter}, ${feedback || "not submitted"}` : "empty");
+      const label = feedback
+        ? `${letter.toUpperCase()}, ${FEEDBACK_LABELS[feedback]}`
+        : letter.toUpperCase() || "Blank";
+      tile.setAttribute("aria-label", label);
     });
   });
 
@@ -179,15 +188,19 @@ function render() {
   keyboard.querySelectorAll(".key").forEach((key) => {
     const feedback = keyFeedback[key.dataset.key];
     key.className = `key${key.dataset.key.length > 1 ? " wide" : ""}${feedback ? ` ${feedback}` : ""}`;
+    if (key.dataset.key.length === 1) {
+      const letter = key.dataset.key.toUpperCase();
+      key.setAttribute("aria-label", feedback ? `${letter}, ${FEEDBACK_LABELS[feedback]}` : letter);
+    }
   });
 
+  let gameMessage = "";
   if (game.status === "won") {
-    message.textContent = `Solved in ${game.guesses.length}/6!`;
+    gameMessage = `Solved in ${game.guesses.length}/6!`;
   } else if (game.status === "lost") {
-    message.textContent = `The word was ${game.answer.toUpperCase()}.`;
-  } else {
-    message.textContent = "";
+    gameMessage = `The word was ${game.answer.toUpperCase()}.`;
   }
+  if (message.textContent !== gameMessage) message.textContent = gameMessage;
 
   const metadata = game.status === "playing" ? null : metadataForAnswer(game.answer);
   answerCard.hidden = !metadata;
@@ -250,6 +263,12 @@ keyboard.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.ctrlKey || event.metaKey || event.altKey) return;
+  const target = event.target;
+  if (target instanceof HTMLElement && (
+    target.isContentEditable ||
+    /^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test(target.tagName) ||
+    statsDialog.open
+  )) return;
   if (event.key === "Enter" || event.key === "Backspace" || /^[a-z]$/i.test(event.key)) {
     event.preventDefault();
     handleKey(event.key);
@@ -259,8 +278,10 @@ document.addEventListener("keydown", (event) => {
 statsButton.addEventListener("click", () => {
   renderStats();
   statsDialog.showModal();
+  statsClose.focus();
 });
 statsClose.addEventListener("click", () => statsDialog.close());
+statsDialog.addEventListener("close", () => statsButton.focus());
 statsDialog.addEventListener("click", (event) => {
   if (event.target === statsDialog) statsDialog.close();
 });
