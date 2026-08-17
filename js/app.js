@@ -9,6 +9,13 @@ import {
 import { metadataForAnswer } from "./answer-metadata.js";
 import { answerForDate } from "./answer-schedule.js";
 import { localDateKey } from "./words.js";
+import {
+  STATS_STORAGE_KEY,
+  createStats,
+  parseStats,
+  recordResult,
+  summarizeStats
+} from "./stats.js";
 
 const STORAGE_KEY = "fivefold:v1";
 const KEY_ROWS = [
@@ -23,10 +30,16 @@ const message = document.querySelector("#message");
 const answerCard = document.querySelector("#answer-card");
 const answerCardWord = document.querySelector("#answer-card-word");
 const answerCardDefinition = document.querySelector("#answer-card-definition");
+const statsButton = document.querySelector("#stats-button");
+const statsDialog = document.querySelector("#stats-dialog");
+const statsClose = document.querySelector("#stats-close");
+const statsSummary = document.querySelector("#stats-summary");
+const guessDistribution = document.querySelector("#guess-distribution");
 const date = localDateKey();
 const answer = answerForDate(date);
 let stored = loadStoredData();
 let game = restoreGame(stored.currentGame, date, answer);
+let stats = loadStats();
 let currentInput = "";
 
 function emptyHistory() {
@@ -60,30 +73,50 @@ function saveStoredData() {
   }
 }
 
-function dayDifference(later, earlier) {
-  const parse = (value) => {
-    const [year, month, day] = value.split("-").map(Number);
-    return Date.UTC(year, month - 1, day);
-  };
-  return Math.round((parse(later) - parse(earlier)) / 86400000);
+function loadStats() {
+  try {
+    return parseStats(localStorage.getItem(STATS_STORAGE_KEY));
+  } catch {
+    return createStats();
+  }
 }
 
 function recordCompletion() {
-  const history = stored.history;
-  if (history.lastCompletedDate === game.date) return;
-
-  history.played += 1;
-  if (game.status === "won") {
-    history.wins += 1;
-    history.currentStreak = history.lastCompletedDate && dayDifference(game.date, history.lastCompletedDate) === 1
-      ? history.currentStreak + 1
-      : 1;
-    history.maxStreak = Math.max(history.maxStreak, history.currentStreak);
-    history.guessDistribution[game.guesses.length - 1] += 1;
-  } else {
-    history.currentStreak = 0;
+  if (game.status === "playing") return;
+  stats = recordResult(stats, game.date, game.status === "won"
+    ? { status: "won", guesses: game.guesses.length }
+    : { status: "lost" });
+  try {
+    localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(stats));
+  } catch {
+    // The game remains playable if storage is unavailable or full.
   }
-  history.lastCompletedDate = game.date;
+}
+
+function renderStats() {
+  const summary = summarizeStats(stats);
+  const values = [
+    ["Played", summary.gamesPlayed],
+    ["Win %", summary.winPercentage],
+    ["Current streak", summary.currentStreak],
+    ["Max streak", summary.maxStreak]
+  ];
+  statsSummary.replaceChildren(...values.map(([label, value]) => {
+    const item = document.createElement("div");
+    item.className = "stat-item";
+    item.innerHTML = `<strong>${value}</strong><span>${label}</span>`;
+    return item;
+  }));
+
+  const largest = Math.max(...summary.guessDistribution, 1);
+  guessDistribution.replaceChildren(...summary.guessDistribution.map((count, index) => {
+    const row = document.createElement("div");
+    row.className = "distribution-row";
+    row.setAttribute("aria-label", `${index + 1} guesses: ${count} wins`);
+    const width = count === 0 ? 8 : Math.max(12, (count / largest) * 100);
+    row.innerHTML = `<span>${index + 1}</span><span class="distribution-bar" style="width: ${width}%">${count}</span>`;
+    return row;
+  }));
 }
 
 function createBoard() {
@@ -196,7 +229,17 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+statsButton.addEventListener("click", () => {
+  renderStats();
+  statsDialog.showModal();
+});
+statsClose.addEventListener("click", () => statsDialog.close());
+statsDialog.addEventListener("click", (event) => {
+  if (event.target === statsDialog) statsDialog.close();
+});
+
 createBoard();
 createKeyboard();
+if (game.status !== "playing") recordCompletion();
 saveStoredData();
 render();

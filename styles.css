@@ -23,8 +23,30 @@ body {
 }
 
 .site-header {
+  position: relative;
   border-bottom: 1px solid var(--border);
   text-align: center;
+}
+
+.stats-button {
+  position: absolute;
+  top: 50%;
+  right: max(0.75rem, calc((100% - 500px) / 2));
+  padding: 0.45rem 0.7rem;
+  transform: translateY(-50%);
+  border: 1px solid var(--filled-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stats-button:focus-visible,
+.stats-close:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
 }
 
 .site-header h1 {
@@ -122,6 +144,80 @@ body {
 .answer-card-definition {
   margin: 0;
   line-height: 1.45;
+}
+
+.stats-dialog {
+  width: min(420px, calc(100vw - 2rem));
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #1a1a1b;
+  color: var(--text);
+}
+
+.stats-dialog::backdrop {
+  background: rgb(0 0 0 / 70%);
+}
+
+.stats-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stats-heading-row h2,
+.stats-dialog h3 {
+  margin: 0;
+}
+
+.stats-close {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.stats-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 1.25rem 0 1.5rem;
+  text-align: center;
+}
+
+.stat-item strong,
+.stat-item span {
+  display: block;
+}
+
+.stat-item strong {
+  font-size: 1.7rem;
+}
+
+.stat-item span {
+  font-size: 0.75rem;
+}
+
+.guess-distribution {
+  margin-top: 0.75rem;
+}
+
+.distribution-row {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.distribution-bar {
+  min-width: 1.5rem;
+  padding: 0.2rem 0.35rem;
+  background: var(--correct);
+  font-weight: 700;
+  text-align: right;
 }
 
 .keyboard-row {

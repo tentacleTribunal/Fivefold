@@ -29,7 +29,13 @@ It can also be published directly from the repository root with GitHub Pages.
 - `js/answer-metadata.js` contains locally bundled definitions for the curated
   daily answers.
 - `js/app.js` owns rendering, input, and versioned `localStorage` persistence.
-- The current game and basic win/streak history use the `fivefold:v1` storage key.
+- `js/stats.js` contains DOM-free result validation and derived player statistics.
+- The current daily game remains in `fivefold:v1`. Completed dated results use the
+  separate `fivefold:stats:v1` storage key, making completion recording idempotent.
+
+Player statistics persist across daily puzzles and refreshes, including games
+played, wins, streaks, and guess distribution. They remain local to the current
+browser/device; Fivefold does not sync them to an account or server.
 
 The curated answer catalog and dated schedule are separate: adding eligible
 answers does not assign them to dates. Published schedule entries are immutable,
