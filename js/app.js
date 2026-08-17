@@ -1,4 +1,5 @@
 import {
+  InvalidGuessError,
   MAX_GUESSES,
   WORD_LENGTH,
   keyboardFeedback,
@@ -153,7 +154,15 @@ function handleKey(key) {
       message.textContent = "Enter five letters.";
       return;
     }
-    game = submitGuess(game, currentInput);
+    try {
+      game = submitGuess(game, currentInput);
+    } catch (error) {
+      if (error instanceof InvalidGuessError) {
+        message.textContent = error.message;
+        return;
+      }
+      throw error;
+    }
     currentInput = "";
     if (game.status !== "playing") recordCompletion();
     saveStoredData();

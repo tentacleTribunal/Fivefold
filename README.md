@@ -18,6 +18,8 @@ It can also be published directly from the repository root with GitHub Pages.
 ## Design
 
 - `js/game-engine.js` contains DOM-free, serializable game rules.
+- `js/accepted-guesses.js` contains the accepted-guess dictionary, including
+  every word in the answer pool.
 - `js/words.js` contains the frozen, pre-shuffled answer order and deterministic
   local-calendar-day selection.
 - `js/app.js` owns rendering, input, and versioned `localStorage` persistence.
@@ -27,6 +29,6 @@ The answer sequence cycles only after every answer in the pool has appeared.
 Because this is a static client-only game, the device's local date determines the
 daily puzzle and the answer pool is necessarily visible in the downloaded source.
 
-For this first milestone, any five alphabetic characters form an accepted guess.
-A future version should add a curated guess dictionary and clear invalid-word
-feedback without coupling dictionary validation to the UI.
+The accepted-guess dictionary is intentionally limited to the answer pool and a
+modest, hand-curated set of common five-letter guesses. It is not intended to be
+an exhaustive English dictionary and can be expanded in later versions.

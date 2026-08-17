@@ -1,5 +1,14 @@
+import { isAcceptedGuess } from "./accepted-guesses.js";
+
 export const WORD_LENGTH = 5;
 export const MAX_GUESSES = 6;
+
+export class InvalidGuessError extends Error {
+  constructor() {
+    super("Not in word list.");
+    this.name = "InvalidGuessError";
+  }
+}
 
 const LETTERS_ONLY = /^[a-z]{5}$/;
 const FEEDBACK_RANK = Object.freeze({ absent: 1, present: 2, correct: 3 });
@@ -50,17 +59,24 @@ export function createGame(date, answerInput) {
   return { version: 1, date, answer, guesses: [], status: "playing" };
 }
 
+function applyGuess(game, word) {
+  const feedback = evaluateGuess(game.answer, word);
+  const guesses = [...game.guesses, { word, feedback }];
+  const won = feedback.every((result) => result === "correct");
+  const status = won ? "won" : guesses.length >= MAX_GUESSES ? "lost" : "playing";
+  return { ...game, guesses, status };
+}
+
 export function submitGuess(game, guessInput) {
   if (game.status !== "playing") {
     throw new Error("This game is already complete");
   }
 
   const word = requireWord(guessInput, "guess");
-  const feedback = evaluateGuess(game.answer, word);
-  const guesses = [...game.guesses, { word, feedback }];
-  const won = feedback.every((result) => result === "correct");
-  const status = won ? "won" : guesses.length >= MAX_GUESSES ? "lost" : "playing";
-  return { ...game, guesses, status };
+  if (!isAcceptedGuess(word)) {
+    throw new InvalidGuessError();
+  }
+  return applyGuess(game, word);
 }
 
 export function restoreGame(saved, date, answer) {
@@ -72,7 +88,7 @@ export function restoreGame(saved, date, answer) {
   for (const entry of saved.guesses.slice(0, MAX_GUESSES)) {
     if (game.status !== "playing") break;
     try {
-      game = submitGuess(game, entry?.word);
+      game = applyGuess(game, requireWord(entry?.word, "guess"));
     } catch {
       break;
     }
