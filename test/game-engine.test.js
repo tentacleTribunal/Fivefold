@@ -22,6 +22,14 @@ import { ANSWERS } from "../js/words.js";
 import { HISTORICAL_ANSWERS } from "./fixtures/historical-answers.js";
 
 const DATE = "2026-01-01";
+const PUBLISHED_COUNT = 229;
+const ORIGINAL_ANSWER_COUNT = 96;
+
+test("the curated answer catalog has 365 unique lowercase five-letter words", () => {
+  assert.equal(ANSWERS.length, 365);
+  assert.equal(new Set(ANSWERS).size, ANSWERS.length);
+  for (const answer of ANSWERS) assert.match(answer, /^[a-z]{5}$/, answer);
+});
 
 test("every answer is accepted as a guess", () => {
   for (const answer of ANSWERS) assert.equal(isAcceptedGuess(answer), true, answer);
@@ -32,6 +40,7 @@ test("every answer has exactly one nonblank definition", () => {
   for (const answer of ANSWERS) {
     const metadata = metadataForAnswer(answer);
     assert.ok(metadata, answer);
+    assert.deepEqual(Object.keys(metadata), ["definition"], answer);
     assert.equal(typeof metadata.definition, "string", answer);
     assert.notEqual(metadata.definition.trim(), "", answer);
   }
@@ -140,7 +149,7 @@ function dateForOffset(offset) {
 }
 
 test("all 229 published dates match the independent historical snapshot", () => {
-  assert.equal(HISTORICAL_ANSWERS.length, 229);
+  assert.equal(HISTORICAL_ANSWERS.length, PUBLISHED_COUNT);
   HISTORICAL_ANSWERS.forEach((expected, offset) => {
     assert.equal(answerForDate(dateForOffset(offset)), expected, dateForOffset(offset));
   });
@@ -151,18 +160,34 @@ test("the final published historical answer remains whale", () => {
 });
 
 test("the explicit schedule has the documented first and last dates", () => {
-  assert.equal(ANSWER_SCHEDULE.length, 243);
+  assert.equal(ANSWER_SCHEDULE.length, 594);
   assert.equal(SCHEDULE_START_DATE, "2026-01-01");
   assert.equal(answerForDate(SCHEDULE_START_DATE), "crane");
-  assert.equal(SCHEDULE_END_DATE, "2026-08-31");
-  assert.equal(answerForDate(SCHEDULE_END_DATE), "ivory");
+  assert.equal(SCHEDULE_END_DATE, "2027-08-17");
+  assert.equal(answerForDate(SCHEDULE_END_DATE), "light");
+});
+
+test("the future year is a permutation of the complete answer catalog", () => {
+  const future = ANSWER_SCHEDULE.slice(PUBLISHED_COUNT);
+  assert.equal(future.length, 365);
+  assert.equal(new Set(future).size, 365);
+  assert.deepEqual(new Set(future), new Set(ANSWERS));
+});
+
+test("all new answers precede reused original answers in the future schedule", () => {
+  const future = ANSWER_SCHEDULE.slice(PUBLISHED_COUNT);
+  const originalAnswers = new Set(ANSWERS.slice(0, ORIGINAL_ANSWER_COUNT));
+  const newAnswers = new Set(ANSWERS.slice(ORIGINAL_ANSWER_COUNT));
+
+  assert.equal(future.slice(0, 269).every((answer) => newAnswers.has(answer)), true);
+  assert.equal(future.slice(269).every((answer) => originalAnswers.has(answer)), true);
 });
 
 test("the schedule rejects invalid and unscheduled dates", () => {
   assert.throws(() => answerForDate("2026-02-31"), RangeError);
   assert.throws(() => answerForDate("not-a-date"), TypeError);
   assert.throws(() => answerForDate("2025-12-31"), RangeError);
-  assert.throws(() => answerForDate("2026-09-01"), RangeError);
+  assert.throws(() => answerForDate("2027-08-18"), RangeError);
 });
 
 test("every scheduled answer belongs to the catalog and its related data", () => {
@@ -187,7 +212,7 @@ test("appending schedule entries cannot alter earlier dates", () => {
   ANSWER_SCHEDULE.forEach((expected, offset) => {
     assert.equal(answerForDate(dateForOffset(offset), extendedSchedule), expected);
   });
-  assert.equal(answerForDate("2026-09-01", extendedSchedule), "crane");
+  assert.equal(answerForDate("2027-08-18", extendedSchedule), "crane");
 });
 
 test("representative in-progress and completed v1 games retain historical behavior", () => {
