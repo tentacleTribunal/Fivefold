@@ -34,6 +34,36 @@
           <textarea id="share-manual" class="share-manual" aria-labelledby="share-manual-label" readonly hidden></textarea>
         </div>
       </aside>
+
+      <div class="companion-dock">
+        <button
+          id="companion-toggle"
+          class="companion-tab"
+          type="button"
+          aria-expanded="false"
+          aria-controls="companion-desk"
+        >Companion</button>
+        <aside id="companion-desk" class="companion-desk" aria-labelledby="companion-desk-heading" hidden>
+          <div class="companion-desk-sheet">
+            <h2 id="companion-desk-heading">Companion Desk</h2>
+            <p class="companion-desk-intro">Pass the puzzle between Fivefold and any companion chat.</p>
+            <ol class="companion-steps">
+              <li>Copy the game state.</li>
+              <li>Paste your companion’s reply.</li>
+              <li>Submit their guess.</li>
+            </ol>
+            <button id="companion-copy" class="companion-button" type="button">Copy for companion</button>
+            <label id="companion-manual-label" class="visually-hidden" for="companion-manual">
+              Game state for your companion. Select and copy the text below manually.
+            </label>
+            <textarea id="companion-manual" class="companion-textarea companion-manual" aria-labelledby="companion-manual-label" readonly hidden></textarea>
+            <label class="companion-reply-label" for="companion-reply">Paste your companion’s reply</label>
+            <textarea id="companion-reply" class="companion-textarea" placeholder="FIVEFOLD_GUESS: crane"></textarea>
+            <button id="companion-submit" class="companion-button companion-submit" type="button">Submit companion guess</button>
+            <p id="companion-status" class="companion-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          </div>
+        </aside>
+      </div>
     </main>
 
     <dialog id="stats-dialog" class="stats-dialog" aria-labelledby="stats-heading">

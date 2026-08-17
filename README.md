@@ -32,6 +32,7 @@ It can also be published directly from the repository root with GitHub Pages.
   daily answers.
 - `js/app.js` owns rendering, input, and versioned `localStorage` persistence.
 - `js/companion-interface.js` defines the DOM-free, versioned companion contract.
+- `js/companion-desk.js` formats safe companion messages and extracts replies.
 - `js/stats.js` contains DOM-free result validation and derived player statistics.
 - `js/share.js` generates DOM-free, spoiler-free text for completed games.
 - The current daily game remains in `fivefold:v1`. Completed dated results use the
@@ -55,6 +56,20 @@ Fivefold bundles a deduplicated subset containing only lowercase, five-letter
 ASCII words, so guess validation makes no runtime network requests. The daily
 answer pool remains separately curated and is not sourced from ENABLE; answers
 are automatically accepted whether or not they appear in the ENABLE subset.
+
+## Play with a companion
+
+Expand **Play with a companion** below the game, then use this loop:
+
+1. Copy the current game state and paste it into any text companion that can
+   read and reply to pasted text.
+2. Paste the companion's complete reply back into Fivefold.
+3. Submit the companion guess, then copy the updated state for the next turn.
+
+The Companion Desk needs no DevTools, account, extension, or provider
+integration. Everything stays browser-local, and while the puzzle is active the
+copied message contains no answer or definition. Once the game is complete, you
+can copy a final update containing the revealed answer.
 
 ## Browser-local companion interface
 

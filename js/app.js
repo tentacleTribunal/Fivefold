@@ -12,6 +12,7 @@ import { localDateKey } from "./words.js";
 import { generateShareText } from "./share.js";
 import { copyText } from "./clipboard.js";
 import { createCompanionInterface } from "./companion-interface.js";
+import { extractCompanionGuess, formatCompanionMessage } from "./companion-desk.js";
 import {
   STATS_STORAGE_KEY,
   createStats,
@@ -44,6 +45,13 @@ const shareControls = document.querySelector("#share-controls");
 const shareButton = document.querySelector("#share-button");
 const shareStatus = document.querySelector("#share-status");
 const shareManual = document.querySelector("#share-manual");
+const companionToggle = document.querySelector("#companion-toggle");
+const companionDesk = document.querySelector("#companion-desk");
+const companionCopy = document.querySelector("#companion-copy");
+const companionManual = document.querySelector("#companion-manual");
+const companionReply = document.querySelector("#companion-reply");
+const companionSubmit = document.querySelector("#companion-submit");
+const companionStatus = document.querySelector("#companion-status");
 const statsButton = document.querySelector("#stats-button");
 const statsDialog = document.querySelector("#stats-dialog");
 const statsClose = document.querySelector("#stats-close");
@@ -230,6 +238,10 @@ function render() {
     shareStatus.textContent = "";
     shareManual.hidden = true;
   }
+
+  const companionComplete = game.status !== "playing";
+  companionReply.disabled = companionComplete;
+  companionSubmit.disabled = companionComplete;
 }
 
 function showShareStatus(text, clearAfter = 3000) {
@@ -314,6 +326,53 @@ shareButton.addEventListener("click", async () => {
     shareManual.focus();
     shareManual.select();
   }
+});
+
+companionToggle.addEventListener("click", () => {
+  const opening = companionToggle.getAttribute("aria-expanded") !== "true";
+  if (!opening && companionDesk.contains(document.activeElement)) companionToggle.focus();
+  companionToggle.setAttribute("aria-expanded", String(opening));
+  companionDesk.hidden = !opening;
+});
+
+companionCopy.addEventListener("click", async () => {
+  const companionText = formatCompanionMessage(companion.api.getState());
+  companionManual.hidden = true;
+
+  if (await copyText(companionText)) {
+    companionStatus.textContent = game.status === "playing"
+      ? "Copied for your companion."
+      : "Final update copied for your companion.";
+  } else {
+    companionManual.value = companionText;
+    companionManual.hidden = false;
+    companionStatus.textContent = "Automatic copy wasn’t available. Select and copy the game state below.";
+    companionManual.focus();
+    companionManual.select();
+  }
+});
+
+companionSubmit.addEventListener("click", () => {
+  const parsed = extractCompanionGuess(companionReply.value);
+  if (!parsed.ok) {
+    companionStatus.textContent = parsed.error.message;
+    return;
+  }
+
+  const result = companion.api.submitGuess(parsed.word);
+  if (result.ok) {
+    companionReply.value = "";
+    companionStatus.textContent = `${parsed.word.toUpperCase()} submitted. Copy the updated game state back to your companion.`;
+    return;
+  }
+
+  const messages = {
+    INVALID_GUESS: "That word isn’t in Fivefold’s guess list. Ask your companion for another.",
+    INVALID_INPUT: "That guess isn’t five letters.",
+    GAME_COMPLETE: "Today’s puzzle is already complete.",
+    INTERNAL_ERROR: "Fivefold couldn’t submit that guess."
+  };
+  companionStatus.textContent = messages[result.error.code] ?? messages.INTERNAL_ERROR;
 });
 
 createBoard();
