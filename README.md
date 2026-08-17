@@ -18,8 +18,9 @@ It can also be published directly from the repository root with GitHub Pages.
 ## Design
 
 - `js/game-engine.js` contains DOM-free, serializable game rules.
-- `js/accepted-guesses.js` contains the accepted-guess dictionary, including
-  every word in the answer pool.
+- `js/accepted-guesses.js` combines the accepted-guess vocabulary with every
+  word in the answer pool.
+- `js/enable-words.js` contains the locally bundled accepted-guess vocabulary.
 - `js/words.js` contains the frozen, pre-shuffled answer order and deterministic
   local-calendar-day selection.
 - `js/app.js` owns rendering, input, and versioned `localStorage` persistence.
@@ -29,6 +30,8 @@ The answer sequence cycles only after every answer in the pool has appeared.
 Because this is a static client-only game, the device's local date determines the
 daily puzzle and the answer pool is necessarily visible in the downloaded source.
 
-The accepted-guess dictionary is intentionally limited to the answer pool and a
-modest, hand-curated set of common five-letter guesses. It is not intended to be
-an exhaustive English dictionary and can be expanded in later versions.
+The accepted-guess vocabulary comes from the public-domain ENABLE 1 word list.
+Fivefold bundles a deduplicated subset containing only lowercase, five-letter
+ASCII words, so guess validation makes no runtime network requests. The daily
+answer pool remains separately curated and is not sourced from ENABLE; answers
+are automatically accepted whether or not they appear in the ENABLE subset.

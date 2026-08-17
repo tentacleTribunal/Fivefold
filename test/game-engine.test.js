@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { ACCEPTED_GUESSES, isAcceptedGuess } from "../js/accepted-guesses.js";
+import { ENABLE_FIVE_LETTER_WORDS } from "../js/enable-words.js";
 import {
   InvalidGuessError,
   createGame,
@@ -16,6 +17,16 @@ const DATE = "2026-01-01";
 
 test("every answer is accepted as a guess", () => {
   for (const answer of ANSWERS) assert.equal(isAcceptedGuess(answer), true, answer);
+});
+
+test("ENABLE vocabulary accepts the hands QA case", () => {
+  assert.equal(ENABLE_FIVE_LETTER_WORDS.includes("hands"), true);
+  assert.equal(isAcceptedGuess("hands"), true);
+});
+
+test("bundled ENABLE entries are unique lowercase five-letter words", () => {
+  assert.equal(new Set(ENABLE_FIVE_LETTER_WORDS).size, ENABLE_FIVE_LETTER_WORDS.length);
+  for (const word of ENABLE_FIVE_LETTER_WORDS) assert.match(word, /^[a-z]{5}$/, word);
 });
 
 test("accepted guesses are unique lowercase five-letter words", () => {
