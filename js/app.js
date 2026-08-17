@@ -6,6 +6,7 @@ import {
   restoreGame,
   submitGuess
 } from "./game-engine.js";
+import { metadataForAnswer } from "./answer-metadata.js";
 import { answerForDate, localDateKey } from "./words.js";
 
 const STORAGE_KEY = "fivefold:v1";
@@ -18,6 +19,9 @@ const KEY_ROWS = [
 const board = document.querySelector("#board");
 const keyboard = document.querySelector("#keyboard");
 const message = document.querySelector("#message");
+const answerCard = document.querySelector("#answer-card");
+const answerCardWord = document.querySelector("#answer-card-word");
+const answerCardDefinition = document.querySelector("#answer-card-definition");
 const date = localDateKey();
 const answer = answerForDate(date);
 let stored = loadStoredData();
@@ -141,6 +145,11 @@ function render() {
   } else {
     message.textContent = "";
   }
+
+  const metadata = game.status === "playing" ? null : metadataForAnswer(game.answer);
+  answerCard.hidden = !metadata;
+  answerCardWord.textContent = metadata ? game.answer : "";
+  answerCardDefinition.textContent = metadata?.definition ?? "";
 }
 
 function handleKey(key) {

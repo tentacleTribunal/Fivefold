@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { ACCEPTED_GUESSES, isAcceptedGuess } from "../js/accepted-guesses.js";
+import { ANSWER_METADATA, metadataForAnswer } from "../js/answer-metadata.js";
 import { ENABLE_FIVE_LETTER_WORDS } from "../js/enable-words.js";
 import {
   InvalidGuessError,
@@ -17,6 +18,28 @@ const DATE = "2026-01-01";
 
 test("every answer is accepted as a guess", () => {
   for (const answer of ANSWERS) assert.equal(isAcceptedGuess(answer), true, answer);
+});
+
+test("every answer has exactly one nonblank definition", () => {
+  assert.equal(Object.keys(ANSWER_METADATA).length, ANSWERS.length);
+  for (const answer of ANSWERS) {
+    const metadata = metadataForAnswer(answer);
+    assert.ok(metadata, answer);
+    assert.equal(typeof metadata.definition, "string", answer);
+    assert.notEqual(metadata.definition.trim(), "", answer);
+  }
+});
+
+test("answer metadata contains only current lowercase five-letter answers", () => {
+  const answers = new Set(ANSWERS);
+  for (const key of Object.keys(ANSWER_METADATA)) {
+    assert.match(key, /^[a-z]{5}$/, key);
+    assert.equal(answers.has(key), true, key);
+  }
+});
+
+test("metadata lookup fails gracefully for an unknown answer", () => {
+  assert.equal(metadataForAnswer("xxxxx"), null);
 });
 
 test("ENABLE vocabulary accepts the hands QA case", () => {
@@ -82,6 +105,18 @@ test("six unsuccessful guesses lose the game", () => {
 
   assert.equal(game.status, "lost");
   assert.equal(game.guesses.length, 6);
+});
+
+test("completed games restore with their terminal status", () => {
+  const won = restoreGame({ version: 1, date: DATE, guesses: [{ word: "crane" }] }, DATE, "crane");
+  const lost = restoreGame({
+    version: 1,
+    date: DATE,
+    guesses: ["spoil", "thumb", "eager", "flint", "proud", "cabin"].map((word) => ({ word }))
+  }, DATE, "crane");
+
+  assert.equal(won.status, "won");
+  assert.equal(lost.status, "lost");
 });
 
 test("keyboard feedback preserves the strongest state for each letter", () => {

@@ -101,6 +101,29 @@ body {
   width: min(500px, 100%);
 }
 
+.answer-card {
+  width: min(500px, 94vw);
+  margin-top: 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #1a1a1b;
+  text-align: center;
+}
+
+.answer-card-word {
+  margin: 0 0 0.4rem;
+  color: var(--text);
+  font-size: 1.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.answer-card-definition {
+  margin: 0;
+  line-height: 1.45;
+}
+
 .keyboard-row {
   display: flex;
   justify-content: center;

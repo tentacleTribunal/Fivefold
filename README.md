@@ -3,6 +3,8 @@
 Fivefold is a free daily five-letter word puzzle. Players have six attempts to
 find the day's word, with correct, present, and absent feedback on the board and
 keyboard.
+After a puzzle is completed, the daily answer and a concise definition are
+revealed beneath the game.
 
 ## Run locally
 
@@ -23,6 +25,8 @@ It can also be published directly from the repository root with GitHub Pages.
 - `js/enable-words.js` contains the locally bundled accepted-guess vocabulary.
 - `js/words.js` contains the frozen, pre-shuffled answer order and deterministic
   local-calendar-day selection.
+- `js/answer-metadata.js` contains locally bundled definitions for the curated
+  daily answers.
 - `js/app.js` owns rendering, input, and versioned `localStorage` persistence.
 - The current game and basic win/streak history use the `fivefold:v1` storage key.
 
