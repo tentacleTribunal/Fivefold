@@ -31,6 +31,9 @@
   --correct: var(--color-botanical);
   --present: #9b762f;
   --absent: #343a3c;
+  --tile-empty: #171b1c;
+  --tile-filled: #202526;
+  --control-surface: #202526;
 
   --page-max: 68rem;
   --game-max: 34rem;
@@ -86,17 +89,34 @@ body {
   position: absolute;
   top: 50%;
   right: max(0.75rem, calc((100% - 500px) / 2));
-  padding: 0.45rem 0.7rem;
+  min-height: 2.5rem;
+  padding: 0.42rem 0.72rem;
   transform: translateY(-50%);
   border: 1px solid var(--filled-border);
-  border-radius: 0.25rem;
-  background: transparent;
+  border-radius: 2px;
+  background: var(--control-surface);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 5%),
+    0 2px 5px rgb(0 0 0 / 20%);
   color: var(--text);
   font-family: var(--font-utility);
   font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
   cursor: pointer;
+}
+
+.stats-button:hover,
+.share-button:hover {
+  border-color: var(--color-botanical-bright);
+  background-color: var(--color-surface-raised);
+}
+
+.stats-button:active,
+.share-button:active,
+.key:active {
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 36%);
 }
 
 .stats-button:focus-visible,
@@ -131,13 +151,30 @@ body {
 
 .message {
   min-height: 1.5rem;
-  margin: 0;
-  font-weight: 700;
+  margin: 0 auto;
+  padding: 0.18rem 0.7rem;
+  border-inline: 1px solid transparent;
+  color: var(--color-paper);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  line-height: 1.35;
   text-align: center;
 }
 
+.message:not(:empty) {
+  border-inline-color: var(--color-ochre);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(179 138 69 / 9%) 18%,
+    rgb(179 138 69 / 9%) 82%,
+    transparent
+  );
+}
+
 button,
-.tile,
 .answer-card-word,
 .share-status,
 .stat-item,
@@ -148,48 +185,76 @@ button,
 .board {
   display: grid;
   grid-template-rows: repeat(6, 1fr);
-  gap: 0.3rem;
+  gap: 0.34rem;
   width: min(350px, 88vw);
   margin: 0.75rem auto;
+  padding: 0.5rem;
+  border: 1px solid rgb(89 97 96 / 52%);
+  background: rgb(20 23 25 / 58%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 2.5%),
+    0 12px 30px rgb(0 0 0 / 18%);
 }
 
 .board-row {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 0.3rem;
+  gap: 0.34rem;
 }
 
 .tile {
   display: grid;
   aspect-ratio: 1;
   place-items: center;
-  border: 2px solid var(--border);
+  border: 1px solid #444b4c;
+  border-radius: 1px;
+  background: var(--tile-empty);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 2.5%),
+    inset 0 -2px rgb(0 0 0 / 18%);
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
   font-size: clamp(1.65rem, 8vw, 2rem);
   font-weight: 700;
+  letter-spacing: 0.035em;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .tile.filled {
-  border-color: var(--filled-border);
+  border-color: #747d7c;
+  background: var(--tile-filled);
+  box-shadow:
+    inset 0 0 0 1px rgb(238 230 213 / 7%),
+    inset 0 -3px rgb(0 0 0 / 20%),
+    0 2px 5px rgb(0 0 0 / 18%);
 }
 
 .tile.correct,
 .key.correct {
-  border-color: var(--correct);
+  border-color: var(--color-botanical-bright);
   background: var(--correct);
+  box-shadow:
+    inset 0 0 0 1px rgb(238 230 213 / 14%),
+    inset 0 -3px rgb(0 0 0 / 22%);
 }
 
 .tile.present,
 .key.present {
-  border-color: var(--present);
+  border-color: #d0a65a;
   background: var(--present);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 244 217 / 13%),
+    inset 0 -3px rgb(63 38 5 / 25%);
 }
 
 .tile.absent,
 .key.absent {
-  border-color: var(--absent);
+  border-color: #586062;
   background: var(--absent);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 5%),
+    inset 0 -3px rgb(0 0 0 / 28%);
 }
 
 .keyboard {
@@ -225,13 +290,21 @@ button,
 }
 
 .share-button {
-  padding: 0.55rem 0.9rem;
-  border: 0;
-  border-radius: 4px;
-  background: var(--correct);
+  min-height: 2.75rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--color-botanical-bright);
+  border-radius: 2px;
+  background: var(--control-surface);
+  box-shadow:
+    inset 3px 0 var(--correct),
+    inset 0 1px rgb(255 255 255 / 5%),
+    0 2px 5px rgb(0 0 0 / 20%);
   color: var(--text);
-  font: inherit;
+  font-family: var(--font-utility);
+  font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
   cursor: pointer;
 }
 
@@ -338,8 +411,8 @@ button,
 .keyboard-row {
   display: flex;
   justify-content: center;
-  gap: 0.3rem;
-  margin-bottom: 0.4rem;
+  gap: 0.32rem;
+  margin-bottom: 0.38rem;
 }
 
 .key {
@@ -348,9 +421,13 @@ button,
   height: 3.6rem;
   flex: 1;
   place-items: center;
-  border: 0;
-  border-radius: 4px;
+  border: 1px solid #7a8383;
+  border-radius: 2px;
   background: var(--key);
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 10%),
+    inset 0 -3px rgb(0 0 0 / 24%),
+    0 2px 3px rgb(0 0 0 / 20%);
   color: var(--text);
   font: inherit;
   font-size: 0.82rem;
@@ -359,9 +436,59 @@ button,
   cursor: pointer;
 }
 
+.key:hover {
+  border-color: #a0a8a6;
+  background-color: #707879;
+}
+
 .key.wide {
   flex: 1.5;
+  border-color: #8f8270;
+  background: #514b43;
+  box-shadow:
+    inset 0 1px rgb(255 255 255 / 9%),
+    inset 3px 0 var(--color-ochre),
+    inset 0 -3px rgb(0 0 0 / 25%),
+    0 2px 3px rgb(0 0 0 / 20%);
   font-size: 0.7rem;
+  letter-spacing: 0.035em;
+}
+
+.key.wide:hover {
+  border-color: #b6a58b;
+  background-color: #5d564d;
+}
+
+.key.correct,
+.key.correct:hover {
+  border-color: var(--color-botanical-bright);
+  background: var(--correct);
+  box-shadow:
+    inset 0 0 0 1px rgb(238 230 213 / 14%),
+    inset 0 -3px rgb(0 0 0 / 22%);
+}
+
+.key.present,
+.key.present:hover {
+  border-color: #d0a65a;
+  background: var(--present);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 244 217 / 13%),
+    inset 0 -3px rgb(63 38 5 / 25%);
+}
+
+.key.absent,
+.key.absent:hover {
+  border-color: #586062;
+  background: var(--absent);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 5%),
+    inset 0 -3px rgb(0 0 0 / 28%);
+}
+
+.key:active,
+.key.wide:active {
+  box-shadow: inset 0 2px 4px rgb(0 0 0 / 36%);
 }
 
 .visually-hidden {
