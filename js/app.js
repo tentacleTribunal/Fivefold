@@ -9,6 +9,8 @@ import {
 import { metadataForAnswer } from "./answer-metadata.js";
 import { answerForDate } from "./answer-schedule.js";
 import { localDateKey } from "./words.js";
+import { generateShareText } from "./share.js";
+import { copyText } from "./clipboard.js";
 import {
   STATS_STORAGE_KEY,
   createStats,
@@ -30,6 +32,10 @@ const message = document.querySelector("#message");
 const answerCard = document.querySelector("#answer-card");
 const answerCardWord = document.querySelector("#answer-card-word");
 const answerCardDefinition = document.querySelector("#answer-card-definition");
+const shareControls = document.querySelector("#share-controls");
+const shareButton = document.querySelector("#share-button");
+const shareStatus = document.querySelector("#share-status");
+const shareManual = document.querySelector("#share-manual");
 const statsButton = document.querySelector("#stats-button");
 const statsDialog = document.querySelector("#stats-dialog");
 const statsClose = document.querySelector("#stats-close");
@@ -41,6 +47,7 @@ let stored = loadStoredData();
 let game = restoreGame(stored.currentGame, date, answer);
 let stats = loadStats();
 let currentInput = "";
+let shareStatusTimer;
 
 function emptyHistory() {
   return {
@@ -184,6 +191,21 @@ function render() {
   answerCard.hidden = !metadata;
   answerCardWord.textContent = metadata ? game.answer : "";
   answerCardDefinition.textContent = metadata?.definition ?? "";
+  shareControls.hidden = game.status === "playing";
+  if (game.status === "playing") {
+    shareStatus.textContent = "";
+    shareManual.hidden = true;
+  }
+}
+
+function showShareStatus(text, clearAfter = 3000) {
+  window.clearTimeout(shareStatusTimer);
+  shareStatus.textContent = text;
+  if (clearAfter) {
+    shareStatusTimer = window.setTimeout(() => {
+      shareStatus.textContent = "";
+    }, clearAfter);
+  }
 }
 
 function handleKey(key) {
@@ -236,6 +258,21 @@ statsButton.addEventListener("click", () => {
 statsClose.addEventListener("click", () => statsDialog.close());
 statsDialog.addEventListener("click", (event) => {
   if (event.target === statsDialog) statsDialog.close();
+});
+
+shareButton.addEventListener("click", async () => {
+  const shareText = generateShareText(game);
+  shareManual.hidden = true;
+
+  if (await copyText(shareText)) {
+    showShareStatus("Copied!");
+  } else {
+    shareManual.value = shareText;
+    shareManual.hidden = false;
+    showShareStatus("Copy manually below:", 0);
+    shareManual.focus();
+    shareManual.select();
+  }
 });
 
 createBoard();

@@ -5,6 +5,8 @@ find the day's word, with correct, present, and absent feedback on the board and
 keyboard.
 After a puzzle is completed, the daily answer and a concise definition are
 revealed beneath the game.
+Completed games can also generate a spoiler-free emoji result. Sharing happens
+locally through clipboard copy; the answer and guessed words are omitted.
 
 ## Run locally
 
@@ -30,6 +32,7 @@ It can also be published directly from the repository root with GitHub Pages.
   daily answers.
 - `js/app.js` owns rendering, input, and versioned `localStorage` persistence.
 - `js/stats.js` contains DOM-free result validation and derived player statistics.
+- `js/share.js` generates DOM-free, spoiler-free text for completed games.
 - The current daily game remains in `fivefold:v1`. Completed dated results use the
   separate `fivefold:stats:v1` storage key, making completion recording idempotent.
 
