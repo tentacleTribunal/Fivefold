@@ -30,6 +30,8 @@ const board = document.querySelector("#board");
 const keyboard = document.querySelector("#keyboard");
 const message = document.querySelector("#message");
 const answerCard = document.querySelector("#answer-card");
+const answerCardLabel = document.querySelector("#answer-card-label");
+const answerCardDate = document.querySelector("#answer-card-date");
 const answerCardWord = document.querySelector("#answer-card-word");
 const answerCardDefinition = document.querySelector("#answer-card-definition");
 const shareControls = document.querySelector("#share-controls");
@@ -189,6 +191,9 @@ function render() {
 
   const metadata = game.status === "playing" ? null : metadataForAnswer(game.answer);
   answerCard.hidden = !metadata;
+  answerCardLabel.hidden = !metadata;
+  answerCardDate.textContent = metadata ? game.date : "";
+  answerCardDate.dateTime = metadata ? game.date : "";
   answerCardWord.textContent = metadata ? game.answer : "";
   answerCardDefinition.textContent = metadata?.definition ?? "";
   shareControls.hidden = game.status === "playing";

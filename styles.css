@@ -262,44 +262,120 @@ button,
 }
 
 .answer-card {
+  position: relative;
   width: min(500px, 94vw);
-  margin-top: 1rem;
-  padding: 1rem 1.15rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--color-surface);
+  margin: 1.6rem auto 0;
+  padding: clamp(1.6rem, 5vw, 2.1rem) clamp(1.15rem, 5vw, 2.35rem) 1.5rem;
+  transform: rotate(-0.45deg);
+  border: 1px solid #d1c5ad;
+  border-radius: 2px;
+  background-color: var(--color-paper);
+  background-image:
+    linear-gradient(rgb(117 103 131 / 8%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(117 103 131 / 5%) 1px, transparent 1px);
+  background-size: 100% 1.55rem, 1.55rem 100%;
+  box-shadow:
+    0 2px 2px rgb(0 0 0 / 20%),
+    0 14px 28px rgb(0 0 0 / 34%);
+  color: var(--color-ink);
   text-align: center;
 }
 
-.answer-card-word {
-  margin: 0 0 0.4rem;
-  color: var(--text);
-  font-size: 1.4rem;
-  letter-spacing: 0.12em;
+.answer-card::before,
+.answer-card::after {
+  position: absolute;
+  top: -0.65rem;
+  width: clamp(4rem, 20vw, 6.2rem);
+  height: 1.25rem;
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 9%), transparent 16% 84%, rgb(80 65 50 / 7%)),
+    rgb(221 211 190 / 72%);
+  box-shadow: 0 1px 2px rgb(63 48 34 / 13%);
+  content: "";
+  opacity: 0.88;
+  pointer-events: none;
+}
+
+.answer-card::before {
+  left: 7%;
+  transform: rotate(-2deg);
+}
+
+.answer-card::after {
+  right: 7%;
+  transform: rotate(1.5deg);
+}
+
+.answer-card-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  margin: 0 0 0.55rem;
+  color: #615d55;
+  font-family: var(--font-utility);
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.13em;
+  line-height: 1.2;
   text-transform: uppercase;
+}
+
+.answer-card-label[hidden] {
+  display: none;
+}
+
+.answer-card-word {
+  position: relative;
+  isolation: isolate;
+  display: inline-block;
+  margin: 0 0 0.65rem;
+  color: #24211d;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 8vw, 2.45rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.answer-card-word::after {
+  position: absolute;
+  right: -0.16rem;
+  bottom: -0.12rem;
+  left: -0.16rem;
+  z-index: -1;
+  height: 0.42rem;
+  transform: rotate(-1.25deg);
+  background: rgb(117 103 131 / 34%);
+  content: "";
 }
 
 .answer-card-definition {
   margin: 0;
-  line-height: 1.45;
-  color: var(--color-text-secondary);
+  color: #35312b;
+  font-family: var(--font-body);
+  font-size: 1.04rem;
+  line-height: 1.55;
 }
 
 .share-controls {
-  margin-top: 1rem;
+  margin: 1.2rem -0.35rem -0.35rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgb(66 107 88 / 35%);
 }
 
 .share-button {
+  position: relative;
   min-height: 2.75rem;
-  padding: 0.55rem 1rem;
-  border: 1px solid var(--color-botanical-bright);
-  border-radius: 2px;
-  background: var(--control-surface);
+  padding: 0.55rem 1.2rem 0.55rem 1.45rem;
+  border: 1px solid #385c4b;
+  border-radius: 1px 5px 5px 1px;
+  background: #365746;
   box-shadow:
-    inset 3px 0 var(--correct),
-    inset 0 1px rgb(255 255 255 / 5%),
-    0 2px 5px rgb(0 0 0 / 20%);
-  color: var(--text);
+    inset 5px 0 rgb(238 230 213 / 24%),
+    0 2px 4px rgb(55 46 35 / 22%);
+  color: #fffaf0;
   font-family: var(--font-utility);
   font-size: 0.82rem;
   font-weight: 700;
@@ -311,22 +387,28 @@ button,
 .share-status {
   min-height: 1.25rem;
   margin: 0.4rem 0 0;
+  color: #3e493f;
   font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .share-manual {
   display: block;
-  width: min(420px, 82vw);
+  width: min(420px, 100%);
   min-height: 8rem;
   margin: 0.5rem auto 0;
-  padding: 0.6rem;
+  padding: 0.8rem 0.9rem;
   resize: vertical;
-  border: 1px solid var(--filled-border);
-  border-radius: 4px;
-  background: var(--color-charcoal);
-  color: var(--text);
-  font: inherit;
-  line-height: 1.35;
+  border: 1px solid #a89b82;
+  border-left: 4px solid var(--color-violet);
+  border-radius: 1px;
+  background: rgb(255 252 244 / 72%);
+  box-shadow: inset 0 1px 5px rgb(72 59 40 / 9%);
+  color: #24211d;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  text-align: left;
 }
 
 .share-manual[hidden] {
@@ -335,11 +417,14 @@ button,
 
 .stats-dialog {
   width: min(420px, calc(100vw - 2rem));
-  padding: 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--color-surface);
-  color: var(--text);
+  padding: 1.4rem clamp(1rem, 5vw, 1.65rem) 1.6rem;
+  border: 1px solid #c8bca4;
+  border-radius: 2px;
+  background-color: #e8dfcc;
+  background-image: linear-gradient(rgb(117 103 131 / 8%) 1px, transparent 1px);
+  background-size: 100% 1.65rem;
+  box-shadow: 0 22px 60px rgb(0 0 0 / 48%);
+  color: var(--color-ink);
 }
 
 .stats-dialog::backdrop {
@@ -350,6 +435,8 @@ button,
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding-bottom: 0.7rem;
+  border-bottom: 2px solid rgb(117 103 131 / 42%);
 }
 
 .stats-heading-row h2,
@@ -358,10 +445,24 @@ button,
   font-family: var(--font-display);
 }
 
+.stats-heading-row h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+
+.stats-dialog h3 {
+  color: #575149;
+  font-family: var(--font-utility);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .stats-close {
   border: 0;
   background: transparent;
-  color: var(--text);
+  color: var(--color-ink);
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
@@ -370,7 +471,7 @@ button,
 .stats-summary {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 0.5rem;
+  gap: 0;
   margin: 1.25rem 0 1.5rem;
   text-align: center;
 }
@@ -381,11 +482,23 @@ button,
 }
 
 .stat-item strong {
+  color: #2b2924;
+  font-family: var(--font-display);
   font-size: 1.7rem;
+  line-height: 1.1;
 }
 
 .stat-item span {
+  margin-top: 0.22rem;
+  color: #625d54;
   font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  line-height: 1.2;
+}
+
+.stat-item + .stat-item {
+  border-left: 1px solid rgb(91 82 67 / 24%);
 }
 
 .guess-distribution {
@@ -397,13 +510,17 @@ button,
   grid-template-columns: 1rem 1fr;
   align-items: center;
   gap: 0.5rem;
-  margin-top: 0.3rem;
+  margin-top: 0.42rem;
+  color: #4b463e;
+  font-weight: 700;
 }
 
 .distribution-bar {
   min-width: 1.5rem;
-  padding: 0.2rem 0.35rem;
-  background: var(--correct);
+  padding: 0.18rem 0.4rem;
+  border-right: 2px solid #365746;
+  background: rgb(66 107 88 / 56%);
+  color: #211f1b;
   font-weight: 700;
   text-align: right;
 }
