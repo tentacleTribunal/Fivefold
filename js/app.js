@@ -7,7 +7,8 @@ import {
   submitGuess
 } from "./game-engine.js";
 import { metadataForAnswer } from "./answer-metadata.js";
-import { answerForDate, localDateKey } from "./words.js";
+import { answerForDate } from "./answer-schedule.js";
+import { localDateKey } from "./words.js";
 
 const STORAGE_KEY = "fivefold:v1";
 const KEY_ROWS = [

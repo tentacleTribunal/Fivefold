@@ -2,6 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { ACCEPTED_GUESSES, isAcceptedGuess } from "../js/accepted-guesses.js";
+import {
+  ANSWER_SCHEDULE,
+  SCHEDULE_END_DATE,
+  SCHEDULE_START_DATE,
+  answerForDate
+} from "../js/answer-schedule.js";
 import { ANSWER_METADATA, metadataForAnswer } from "../js/answer-metadata.js";
 import { ENABLE_FIVE_LETTER_WORDS } from "../js/enable-words.js";
 import {
@@ -12,7 +18,8 @@ import {
   restoreGame,
   submitGuess
 } from "../js/game-engine.js";
-import { ANSWERS, answerForDate } from "../js/words.js";
+import { ANSWERS } from "../js/words.js";
+import { HISTORICAL_ANSWERS } from "./fixtures/historical-answers.js";
 
 const DATE = "2026-01-01";
 
@@ -128,15 +135,88 @@ test("keyboard feedback preserves the strongest state for each letter", () => {
   assert.deepEqual(keyboardFeedback(guesses), { a: "correct", b: "present" });
 });
 
-test("daily answers are deterministic and unique for a complete cycle", () => {
-  const dateForOffset = (offset) => {
-    const date = new Date(Date.UTC(2026, 0, 1 + offset));
-    return date.toISOString().slice(0, 10);
-  };
-  const dates = Array.from({ length: ANSWERS.length }, (_, offset) => dateForOffset(offset));
-  const cycle = dates.map(answerForDate);
+function dateForOffset(offset) {
+  return new Date(Date.UTC(2026, 0, 1 + offset)).toISOString().slice(0, 10);
+}
 
-  assert.equal(answerForDate(DATE), answerForDate(DATE));
-  assert.equal(new Set(cycle).size, ANSWERS.length);
-  assert.equal(answerForDate(dateForOffset(ANSWERS.length)), answerForDate(DATE));
+test("all 229 published dates match the independent historical snapshot", () => {
+  assert.equal(HISTORICAL_ANSWERS.length, 229);
+  HISTORICAL_ANSWERS.forEach((expected, offset) => {
+    assert.equal(answerForDate(dateForOffset(offset)), expected, dateForOffset(offset));
+  });
+});
+
+test("the final published historical answer remains whale", () => {
+  assert.equal(answerForDate("2026-08-17"), "whale");
+});
+
+test("the explicit schedule has the documented first and last dates", () => {
+  assert.equal(ANSWER_SCHEDULE.length, 243);
+  assert.equal(SCHEDULE_START_DATE, "2026-01-01");
+  assert.equal(answerForDate(SCHEDULE_START_DATE), "crane");
+  assert.equal(SCHEDULE_END_DATE, "2026-08-31");
+  assert.equal(answerForDate(SCHEDULE_END_DATE), "ivory");
+});
+
+test("the schedule rejects invalid and unscheduled dates", () => {
+  assert.throws(() => answerForDate("2026-02-31"), RangeError);
+  assert.throws(() => answerForDate("not-a-date"), TypeError);
+  assert.throws(() => answerForDate("2025-12-31"), RangeError);
+  assert.throws(() => answerForDate("2026-09-01"), RangeError);
+});
+
+test("every scheduled answer belongs to the catalog and its related data", () => {
+  const catalog = new Set(ANSWERS);
+  for (const answer of ANSWER_SCHEDULE) {
+    assert.equal(catalog.has(answer), true, answer);
+    assert.ok(metadataForAnswer(answer), answer);
+    assert.equal(isAcceptedGuess(answer), true, answer);
+  }
+});
+
+test("catalog growth cannot influence the dated schedule", () => {
+  const expandedCatalog = Object.freeze([...ANSWERS, "extra"]);
+  assert.equal(expandedCatalog.length, ANSWERS.length + 1);
+  HISTORICAL_ANSWERS.forEach((expected, offset) => {
+    assert.equal(answerForDate(dateForOffset(offset)), expected);
+  });
+});
+
+test("appending schedule entries cannot alter earlier dates", () => {
+  const extendedSchedule = Object.freeze([...ANSWER_SCHEDULE, "crane"]);
+  ANSWER_SCHEDULE.forEach((expected, offset) => {
+    assert.equal(answerForDate(dateForOffset(offset), extendedSchedule), expected);
+  });
+  assert.equal(answerForDate("2026-09-01", extendedSchedule), "crane");
+});
+
+test("representative in-progress and completed v1 games retain historical behavior", () => {
+  const date = "2026-08-17";
+  const answer = answerForDate(date);
+  const savedPlaying = { version: 1, date, answer, guesses: [{ word: "crane" }] };
+  const playing = restoreGame(savedPlaying, date, answer);
+  assert.equal(playing.answer, "whale");
+  assert.equal(playing.status, "playing");
+  assert.deepEqual(playing.guesses[0].feedback, evaluateGuess("whale", "crane"));
+
+  const savedWon = { version: 1, date, answer, guesses: [{ word: "whale" }] };
+  const won = restoreGame(savedWon, date, answer);
+  assert.equal(won.answer, "whale");
+  assert.equal(won.status, "won");
+  assert.deepEqual(won.guesses[0].feedback, Array(5).fill("correct"));
+
+  const losingWords = ["crane", "spoil", "thumb", "eager", "flint", "proud"];
+  const savedLost = {
+    version: 1,
+    date,
+    answer,
+    guesses: losingWords.map((word) => ({ word }))
+  };
+  const lost = restoreGame(savedLost, date, answer);
+  assert.equal(lost.answer, "whale");
+  assert.equal(lost.status, "lost");
+  assert.equal(lost.guesses.length, 6);
+  lost.guesses.forEach((guess, index) => {
+    assert.deepEqual(guess.feedback, evaluateGuess("whale", losingWords[index]));
+  });
 });
