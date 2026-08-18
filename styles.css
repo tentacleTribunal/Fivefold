@@ -127,6 +127,9 @@ body {
 .share-manual:focus-visible,
 .companion-tab:focus-visible,
 .companion-button:focus-visible,
+.companion-reset-open:focus-visible,
+.companion-reset-confirm:focus-visible,
+.companion-reset-cancel:focus-visible,
 .companion-textarea:focus-visible,
 .key:focus-visible {
   outline: 3px solid var(--color-focus);
@@ -550,6 +553,64 @@ button,
   font-family: var(--font-utility);
   font-size: 0.9rem;
   font-weight: 700;
+}
+
+.companion-reset-section {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgb(84 75 63 / 32%);
+  font-family: var(--font-utility);
+}
+
+.companion-reset-section[hidden],
+.companion-reset-confirmation[hidden],
+.companion-reset-open[hidden] {
+  display: none;
+}
+
+.companion-reset-open,
+.companion-reset-confirm,
+.companion-reset-cancel {
+  min-height: 2.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #756783;
+  border-radius: 2px;
+  background: rgb(255 252 244 / 65%);
+  color: #493e50;
+  font-family: var(--font-utility);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.companion-reset-open:hover,
+.companion-reset-confirm:hover,
+.companion-reset-cancel:hover {
+  background: #eee6d5;
+  border-color: #564a61;
+}
+
+.companion-reset-confirmation h3 {
+  margin: 0;
+  font-family: var(--font-utility);
+  font-size: 0.95rem;
+}
+
+.companion-reset-confirmation p {
+  margin: 0.35rem 0 0.65rem;
+  color: #544b42;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.companion-reset-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.companion-reset-confirm {
+  background: #665873;
+  color: #fffaf0;
 }
 
 @media (min-width: 82rem) {

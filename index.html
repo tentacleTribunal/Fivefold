@@ -61,6 +61,29 @@
             <textarea id="companion-reply" class="companion-textarea" placeholder="FIVEFOLD_GUESS: crane"></textarea>
             <button id="companion-submit" class="companion-button companion-submit" type="button">Submit companion guess</button>
             <p id="companion-status" class="companion-status" role="status" aria-live="polite" aria-atomic="true"></p>
+            <section id="companion-reset-section" class="companion-reset-section" aria-label="Companion replay" hidden>
+              <button
+                id="companion-reset-open"
+                class="companion-reset-open"
+                type="button"
+                aria-controls="companion-reset-confirmation"
+              >Reset for companion play</button>
+              <div
+                id="companion-reset-confirmation"
+                class="companion-reset-confirmation"
+                role="group"
+                aria-labelledby="companion-reset-heading"
+                aria-describedby="companion-reset-warning"
+                hidden
+              >
+                <h3 id="companion-reset-heading">Start a fresh board for your companion?</h3>
+                <p id="companion-reset-warning">Your stats will stay saved, but this completed board and its share view will be replaced.</p>
+                <div class="companion-reset-actions">
+                  <button id="companion-reset-confirm" class="companion-reset-confirm" type="button">Reset board</button>
+                  <button id="companion-reset-cancel" class="companion-reset-cancel" type="button">Cancel</button>
+                </div>
+              </div>
+            </section>
           </div>
         </aside>
       </div>

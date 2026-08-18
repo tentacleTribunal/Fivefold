@@ -24,6 +24,11 @@ test("the document retains its core accessibility relationships", () => {
   assert.match(html, /id="companion-status"[^>]*role="status"[^>]*aria-live="polite"/);
   assert.match(html, /<label[^>]*for="companion-manual"/);
   assert.match(html, /<textarea id="companion-manual"[^>]*readonly hidden><\/textarea>/);
+  assert.match(html, /<section id="companion-reset-section"[^>]*aria-label="Companion replay" hidden>/);
+  assert.match(html, /id="companion-reset-open"[\s\S]*?aria-controls="companion-reset-confirmation"[\s\S]*?>Reset for companion play<\/button>/);
+  assert.match(html, /id="companion-reset-confirmation"[\s\S]*?role="group"[\s\S]*?aria-labelledby="companion-reset-heading"[\s\S]*?aria-describedby="companion-reset-warning"[\s\S]*?hidden/);
+  assert.match(html, /<button id="companion-reset-confirm"[^>]*type="button">Reset board<\/button>/);
+  assert.match(html, /<button id="companion-reset-cancel"[^>]*type="button">Cancel<\/button>/);
 });
 
 test("rendered tiles expose evaluated feedback in accessible labels", () => {
@@ -37,4 +42,11 @@ test("Companion Desk submits through the public companion API", () => {
   assert.match(app, /companion\.api\.submitGuess\(parsed\.word\)/);
   const deskHandler = app.slice(app.indexOf('companionSubmit.addEventListener("click"'));
   assert.doesNotMatch(deskHandler, /commitGuess\(/);
+});
+
+test("Companion reset confirmation has explicit warnings and managed focus", () => {
+  assert.match(html, /Your stats will stay saved, but this completed board and its share view will be replaced\./);
+  assert.match(app, /companionResetConfirmation\.hidden = false;\s*companionResetConfirm\.focus\(\)/);
+  assert.match(app, /closeCompanionResetConfirmation\(companionResetOpen\)/);
+  assert.match(app, /companion\.notify\(\);\s*companionCopy\.focus\(\)/);
 });

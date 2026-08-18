@@ -2,6 +2,7 @@ import {
   InvalidGuessError,
   MAX_GUESSES,
   WORD_LENGTH,
+  createGame,
   keyboardFeedback,
   restoreGame,
   submitGuess
@@ -52,6 +53,11 @@ const companionManual = document.querySelector("#companion-manual");
 const companionReply = document.querySelector("#companion-reply");
 const companionSubmit = document.querySelector("#companion-submit");
 const companionStatus = document.querySelector("#companion-status");
+const companionResetSection = document.querySelector("#companion-reset-section");
+const companionResetOpen = document.querySelector("#companion-reset-open");
+const companionResetConfirmation = document.querySelector("#companion-reset-confirmation");
+const companionResetConfirm = document.querySelector("#companion-reset-confirm");
+const companionResetCancel = document.querySelector("#companion-reset-cancel");
 const statsButton = document.querySelector("#stats-button");
 const statsDialog = document.querySelector("#stats-dialog");
 const statsClose = document.querySelector("#stats-close");
@@ -242,6 +248,19 @@ function render() {
   const companionComplete = game.status !== "playing";
   companionReply.disabled = companionComplete;
   companionSubmit.disabled = companionComplete;
+  companionResetSection.hidden = !companionComplete;
+  if (!companionComplete && !companionResetConfirmation.hidden) {
+    const resetHadFocus = companionResetConfirmation.contains(document.activeElement);
+    companionResetConfirmation.hidden = true;
+    companionResetOpen.hidden = false;
+    if (resetHadFocus) companionCopy.focus();
+  }
+}
+
+function closeCompanionResetConfirmation(focusTarget) {
+  companionResetConfirmation.hidden = true;
+  companionResetOpen.hidden = false;
+  focusTarget?.focus();
 }
 
 function showShareStatus(text, clearAfter = 3000) {
@@ -373,6 +392,30 @@ companionSubmit.addEventListener("click", () => {
     INTERNAL_ERROR: "Fivefold couldn’t submit that guess."
   };
   companionStatus.textContent = messages[result.error.code] ?? messages.INTERNAL_ERROR;
+});
+
+companionResetOpen.addEventListener("click", () => {
+  companionResetOpen.hidden = true;
+  companionResetConfirmation.hidden = false;
+  companionResetConfirm.focus();
+});
+
+companionResetCancel.addEventListener("click", () => {
+  closeCompanionResetConfirmation(companionResetOpen);
+});
+
+companionResetConfirm.addEventListener("click", () => {
+  game = createGame(date, answer);
+  currentInput = "";
+  companionReply.value = "";
+  companionManual.value = "";
+  companionManual.hidden = true;
+  closeCompanionResetConfirmation();
+  saveStoredData();
+  render();
+  companionStatus.textContent = "Board reset for companion play. Your stats are unchanged.";
+  companion.notify();
+  companionCopy.focus();
 });
 
 createBoard();

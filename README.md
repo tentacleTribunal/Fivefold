@@ -71,3 +71,7 @@ integration. Everything stays browser-local, and while the puzzle is active the
 copied message contains no answer or definition. Once the game is complete, you
 can copy a final update containing the revealed answer.
 
+
+After completing today's puzzle, you can reset the board from the Companion
+Desk so a companion can play from scratch. Your daily stats stay saved, but the
+completed board and its share view are replaced.
